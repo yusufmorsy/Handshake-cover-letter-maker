@@ -1,0 +1,1 @@
+# Handshake-cover-letter-maker
