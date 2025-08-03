@@ -1,0 +1,10 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 12px;
+  width: 320px;
+}
+header { margin-bottom: 8px; }
+#status { margin: 8px 0; color: gray; }
+.hidden { display: none; }
+textarea { width: 100%; }
+button { margin-top: 8px; width: 100%; }
