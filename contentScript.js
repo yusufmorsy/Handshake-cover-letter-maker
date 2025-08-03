@@ -1,10 +1,12 @@
-/* contentScript.js
- * Scrapes Handshake job postings for cover letter generation
- */
-;(function scrapeJob() {
-  console.log('📡 Scraper starting…')
+// contentScript.js
+// Scrapes Handshake job postings for cover letter generation
 
-  const interval = setInterval(() => {
+(function() {
+  /**
+   * Performs the scrape and returns job data when all elements are present.
+   * @returns {{title: string, company: string, overview: string, description: string}|null}
+   */
+  function getJobData() {
     // 1) Title
     const titleEl = document.querySelector('h1.sc-hyeYAt.bbdLgZ')
                    || document.querySelector('h1');
@@ -28,25 +30,42 @@
       '#skip-to-content > div > div.sc-dplrdh.kUQPgF > div.sc-ldzBfC.gsJmga > div > div > div > div:nth-child(4) > div > div'
     );
 
-    console.log('👀 waiting for…', {
-      title:    !!titleEl,
-      company:  !!companyEl,
-      overview: !!overviewEl,
-      desc:     !!descEl
-    });
-
     if (titleEl && companyEl && overviewEl && descEl) {
-      clearInterval(interval);
-
-      const payload = {
+      return {
         title:       titleEl.innerText.trim(),
         company:     companyEl.innerText.trim(),
         overview:    overviewEl.innerText.trim(),
         description: descEl.innerText.trim(),
       };
+    }
+    return null;
+  }
 
+  console.log('📡 Scraper starting…');
+  const interval = setInterval(() => {
+    const payload = getJobData();
+    console.log('👀 waiting for…', {
+      title:    !!payload?.title,
+      company:  !!payload?.company,
+      overview: !!payload?.overview,
+      desc:     !!payload?.description
+    });
+
+    if (payload) {
+      clearInterval(interval);
       console.log('✅ Scraped payload:', payload);
-      chrome.runtime.sendMessage({ type: "JOB_DATA", payload });
+      chrome.runtime.sendMessage({ type: 'JOB_DATA', payload });
     }
   }, 200);
+
+  // Listen for on-demand scrape requests from popup
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === 'SCRAPE_NOW') {
+      const payload = getJobData();
+      sendResponse(payload);
+      // No asynchronous work, so no need to return true
+    }
+    // If not handling SCRAPE_NOW, do not keep sendResponse channel open
+    return false;
+  });
 })();

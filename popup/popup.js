@@ -13,15 +13,35 @@ let currentJob = null;
 let resume = "";
 
 async function init() {
+  // 1) Show loading state
+  statusEl.textContent = "Loading job…";
+
+  // 2) Load stored data
   const store = await chrome.storage.local.get(["currentJob", "apiKey", "resumeText", "pathPrefix"]);
-  currentJob = store.currentJob;
   resume = store.resumeText || "";
 
+  // 3) Attempt fresh scrape from active tab
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_NOW' });
+    if (scraped) {
+      currentJob = scraped;
+      await chrome.storage.local.set({ currentJob });
+    } else {
+      currentJob = store.currentJob;
+    }
+  } catch (err) {
+    console.error('Scrape error:', err);
+    currentJob = store.currentJob;
+  }
+
+  // 4) Validate job data
   if (!currentJob) {
     statusEl.textContent = "Open a job posting on Handshake first.";
     return;
   }
 
+  // 5) Generate the cover letter
   statusEl.textContent = "Generating cover‑letter…";
   try {
     const letter = await generateCoverLetter({ job: currentJob, resume, apiKey: store.apiKey });
@@ -33,17 +53,22 @@ async function init() {
   }
 }
 
-init();
+document.addEventListener('DOMContentLoaded', init);
 
 // Download handler
-downloadBtn.addEventListener("click", () => {
+downloadBtn.addEventListener("click", async () => {
   if (!letterEl.value) return;
+
   const safeTitle = currentJob.title.replace(/[^a-z0-9]+/gi, "_");
   const fileNameBase = `${safeTitle}_CoverLetter`;
-  const prefix = (formatEl.value === "pdf") ? `${fileNameBase}.pdf` : (formatEl.value === "docx") ? `${fileNameBase}.docx` : `${fileNameBase}.txt`;
-  const fileName = (chrome.runtime.getManifest().name === "Handshake Cover‑Letter Generator" && (chrome.storage.local.get("pathPrefix") || "")) ? `${chrome.storage.local.get("pathPrefix")}/${prefix}` : prefix;
+  const ext = formatEl.value;
+  const prefixStore = await chrome.storage.local.get('pathPrefix');
+  const prefix = prefixStore.pathPrefix || '';
+  const fileName = prefix
+    ? `${prefix}/${fileNameBase}.${ext}`
+    : `${fileNameBase}.${ext}`;
 
-  switch (formatEl.value) {
+  switch (ext) {
     case "pdf":
       buildPdf(fileName, letterEl.value);
       break;
