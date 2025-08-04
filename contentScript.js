@@ -8,16 +8,38 @@
    */
   function getJobData() {
     // 1) Title
-    const titleEl = document.querySelector('h1.sc-hyeYAt.bbdLgZ')
-                   || document.querySelector('h1');
+    const titleEl = document.querySelector('a[href*="/jobs/"] h1');
+    if (titleEl) {
+      const jobTitle = titleEl.textContent;
+      console.log(jobTitle);
+    }
 
     // 2) Company
-    const companyEl = document.querySelector('a[href*="/e/"] > div');
+    const companyEl = document.querySelector('a[href*="/e/"] div');
+    if (companyEl) {
+      const companyTitle = companyEl.textContent;
+      console.log(companyTitle);
+    }
 
     // 3) Overview: entire "At a glance" section
-    const overviewEl = document.querySelector(
-      '#skip-to-content > div > div.sc-dplrdh.kUQPgF > div.sc-ldzBfC.gsJmga > div > div > div > div:nth-child(3)'
-    );
+    const overviewEl = document.querySelectorAll('.sc-kJCwM.fElEOM');
+
+    let atAGlanceText = null;
+
+    overviewEl.forEach(div => {
+      const text = div.textContent.trim();
+      if (text.startsWith('At a glance')) {
+        atAGlanceText = text;
+        // If you only want the first one, you can break here
+        // break;
+      }
+    });
+
+    if (atAGlanceText) {
+      console.log(atAGlanceText);
+    } else {
+      console.log('Could not find the "At a glance" section.');
+    }
 
     // 4) Expand full description if collapsed
     const moreBtn = document.querySelector('button.view-more-button');
