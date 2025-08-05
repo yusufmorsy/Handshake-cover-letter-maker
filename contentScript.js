@@ -42,10 +42,10 @@
     }
 
     // 4) Expand full description if collapsed
-    const moreBtn = document.querySelector('button.view-more-button');
-    if (moreBtn && /more/i.test(moreBtn.innerText)) {
-      moreBtn.click();
-    }
+    // const moreBtn = document.querySelector('button.view-more-button');
+    // if (moreBtn && /more/i.test(moreBtn.innerText)) {
+    //   moreBtn.click();
+    // }
 
     // 5) Description: specified section under description
     const descEl = document.querySelector(
