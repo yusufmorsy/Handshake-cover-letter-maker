@@ -48,9 +48,11 @@
     }
 
     // 5) Description — grab all the text in the known wrapper container
-    const descContainer = document.querySelector(
-      '#skip-to-content > div > div:nth-of-type(2) > div > div > div > div:nth-child(4)'
-    );
+    const descContainer = 
+      
+      document.querySelector("#skip-to-content > div > div:nth-child(4)") ||
+      document.querySelector("* > div > div:nth-of-type(2) > div:nth-of-type(2) > div > div > div > div:nth-of-type(4)");
+    
     let descriptionText = '';
     if (descContainer) {
       descriptionText = descContainer.innerText.trim();
