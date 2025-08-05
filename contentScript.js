@@ -3,7 +3,7 @@
 
 (function() {
   /**
-   * Performs the scrape and returns job data when any elements are present.
+   * Performs the scrape and returns job data when all pieces are present.
    * @returns {{title: string, company: string, overview: string, description: string}|null}
    */
   function getJobData() {
@@ -11,30 +11,25 @@
     const titleEl = document.querySelector('a[href*="/jobs/"] h1');
     if (titleEl) {
       console.log("✓ Title:", titleEl.textContent.trim());
-      console.log(titleEl);
     }
 
     // 2) Company
     const companyEl = document.querySelector('a[href*="/e/"] div');
     if (companyEl) {
       console.log("✓ Company:", companyEl.textContent.trim());
-      console.log(companyEl);
     }
 
     // 3) Overview: side-panel cards OR single-job wrapper
     const overviewEls = document.querySelectorAll(
       '.sc-kJCwM.fElEOM, .sc-byhhpF.kgQOGZ'
     );
-
     let atAGlanceText = '';
     overviewEls.forEach(el => {
       const txt = el.innerText.trim();
-      // both types start with "At a glance"
       if (txt.startsWith('At a glance')) {
         atAGlanceText = txt;
       }
     });
-
     if (atAGlanceText) {
       console.log("✓ Overview:", atAGlanceText);
     } else {
@@ -48,11 +43,9 @@
     }
 
     // 5) Description — grab all the text in the known wrapper container
-    const descContainer = 
-      
+    const descContainer =
       document.querySelector("#skip-to-content > div > div:nth-child(4)") ||
       document.querySelector("* > div > div:nth-of-type(2) > div:nth-of-type(2) > div > div > div > div:nth-of-type(4)");
-    
     let descriptionText = '';
     if (descContainer) {
       descriptionText = descContainer.innerText.trim();
@@ -61,41 +54,52 @@
       console.warn("⚠️ Couldn't find the description container.");
     }
 
-    // 6) Return whatever you were able to scrape
-    if (titleEl || companyEl || atAGlanceText || descriptionText) {
+    // 6) Only return once every piece is non-empty
+    if (
+      titleEl?.innerText.trim().length    > 0 &&
+      companyEl?.innerText.trim().length  > 0 &&
+      atAGlanceText.length                > 0 &&
+      descriptionText.length              > 0
+    ) {
       return {
-        title:       titleEl?.innerText.trim()   ?? '',
-        company:     companyEl?.innerText.trim() ?? '',
-        overview:    atAGlanceText               ?? '',
+        title:       titleEl.innerText.trim(),
+        company:     companyEl.innerText.trim(),
+        overview:    atAGlanceText,
         description: descriptionText
       };
     }
+
     return null;
   }
 
   console.log('📡 Scraper starting…');
   const interval = setInterval(() => {
     const payload = getJobData();
-    console.log('👀 waiting for…', {
-      title:    !!payload?.title,
-      company:  !!payload?.company,
-      overview: !!payload?.overview,
-      desc:     !!payload?.description
-    });
 
-    // if (payload) {
-    //   clearInterval(interval);
-    //   console.log('✅ Scraped payload:', payload);
-    //   chrome.runtime.sendMessage({ type: 'JOB_DATA', payload });
-    // }
+    if (payload) {
+      clearInterval(interval);
+      console.log('✅ Full payload:', payload);
+      chrome.runtime.sendMessage({ type: 'JOB_DATA', payload });
+    } else {
+      console.log('👀 still waiting…', {
+        title:    payload?.title?.length    ?? 0,
+        company:  payload?.company?.length  ?? 0,
+        overview: payload?.overview?.length ?? 0,
+        desc:     payload?.description?.length ?? 0
+      });
+    }
   }, 200);
 
   // Listen for on-demand scrape requests from popup
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    console.log("⚡️ contentScript got message:", msg);
+
     if (msg.type === 'SCRAPE_NOW') {
       const payload = getJobData();
+      console.log("⚡️ responding with payload:", payload);
       sendResponse(payload);
     }
-    return false;
+
+    return false; // keep channel open only for synchronous response
   });
 })();

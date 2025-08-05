@@ -5,9 +5,10 @@
   "version": "1.0.0",
   "permissions": [
     "activeTab",
-    "scripting",
+    "tabs",
     "storage",
-    "downloads"
+    "downloads",
+    "webNavigation"
   ],
   "host_permissions": [
     "https://*.joinhandshake.com/*",
@@ -23,12 +24,8 @@
   "options_page": "options/options.html",
   "content_scripts": [
     {
-      "matches": [
-        "https://*.joinhandshake.com/*"
-      ],
-      "js": [
-        "contentScript.js"
-      ],
+      "matches": ["https://*.joinhandshake.com/*"],
+      "js": ["contentScript.js"],
       "run_at": "document_idle"
     }
   ],

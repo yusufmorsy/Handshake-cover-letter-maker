@@ -2,30 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Cover‑Letter Generator</title>
+  <title>Cover-Letter Generator</title>
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-  <header>
-    <h2>Handshake Cover‑Letter</h2>
-  </header>
+  <header><h2>Handshake Cover-Letter</h2></header>
 
   <section id="status">Loading job…</section>
 
   <section id="preview" class="hidden">
     <textarea id="letter" rows="18"></textarea>
-
-    <label>Format:
-      <select id="format">
-        <option value="pdf">PDF</option>
-        <option value="docx">Word (.docx)</option>
-        <option value="txt">Text (.txt)</option>
-      </select>
-    </label>
-
+    <label for="format">Format:</label>
+    <select id="format">
+      <option value="pdf">PDF</option>
+      <option value="docx">Word (.docx)</option>
+      <option value="txt">Text (.txt)</option>
+    </select>
     <button id="downloadBtn">Download</button>
   </section>
 
+  <!-- 1) Load jsPDF from your own extension package -->
+  <script src="libs/jspdf.umd.min.js"></script>
+  <!-- 2) Load docx (IIFE build) from your own extension package -->
+  <script src="libs/docx.iife.js"></script>
+  <!-- 3) Finally, your module code -->
   <script type="module" src="popup.js"></script>
 </body>
 </html>

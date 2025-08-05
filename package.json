@@ -1,0 +1,16 @@
+{
+  "name": "handshake-cover-letter-maker",
+  "version": "1.0.0",
+  "description": "Generate and download targeted cover letters straight from any Handshake job posting using the OpenAI API.",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "docx": "^9.5.1",
+    "jspdf": "^3.0.1"
+  }
+}
