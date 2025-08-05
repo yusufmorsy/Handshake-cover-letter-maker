@@ -3,61 +3,62 @@
 
 (function() {
   /**
-   * Performs the scrape and returns job data when all elements are present.
+   * Performs the scrape and returns job data when any elements are present.
    * @returns {{title: string, company: string, overview: string, description: string}|null}
    */
   function getJobData() {
     // 1) Title
     const titleEl = document.querySelector('a[href*="/jobs/"] h1');
     if (titleEl) {
-      const jobTitle = titleEl.textContent;
-      console.log(jobTitle);
+      console.log("✓ Title:", titleEl.textContent.trim());
     }
 
     // 2) Company
     const companyEl = document.querySelector('a[href*="/e/"] div');
     if (companyEl) {
-      const companyTitle = companyEl.textContent;
-      console.log(companyTitle);
+      console.log("✓ Company:", companyEl.textContent.trim());
     }
 
-    // 3) Overview: entire "At a glance" section
-    const overviewEl = document.querySelectorAll('.sc-kJCwM.fElEOM');
-
+    // 3) Overview: entire "At a glance" section (your existing selector)
+    const overviewEls = document.querySelectorAll('.sc-kJCwM.fElEOM');
     let atAGlanceText = null;
-
-    overviewEl.forEach(div => {
+    overviewEls.forEach(div => {
       const text = div.textContent.trim();
       if (text.startsWith('At a glance')) {
         atAGlanceText = text;
-        // If you only want the first one, you can break here
-        // break;
       }
     });
-
     if (atAGlanceText) {
-      console.log(atAGlanceText);
+      console.log("✓ Overview:", atAGlanceText);
     } else {
-      console.log('Could not find the "At a glance" section.');
+      console.warn('⚠️ Could not find the "At a glance" section.');
     }
 
     // 4) Expand full description if collapsed
-    // const moreBtn = document.querySelector('button.view-more-button');
-    // if (moreBtn && /more/i.test(moreBtn.innerText)) {
-    //   moreBtn.click();
-    // }
+    const moreBtn = document.querySelector('button.view-more-button');
+    if (moreBtn && /more/i.test(moreBtn.innerText)) {
+      moreBtn.click();
+    }
 
-    // 5) Description: specified section under description
-    const descEl = document.querySelector(
-      '#skip-to-content > div > div.sc-dplrdh.kUQPgF > div.sc-ldzBfC.gsJmga > div > div > div > div:nth-child(4) > div > div'
+    // 5) Description — grab all the text in the known wrapper container
+    const descContainer = document.querySelector(
+      '#skip-to-content > div > div.sc-ldzBfC.gsJmga > div > div > div > div:nth-child(4)'
     );
+    let descriptionText = '';
+    if (descContainer) {
+      descriptionText = descContainer.innerText.trim();
+      console.log("✓ Description:", descriptionText);
+    } else {
+      console.warn("⚠️ Couldn't find the description container.");
+    }
 
-    if (titleEl && companyEl && overviewEl && descEl) {
+    // 6) Return whatever you were able to scrape
+    if (titleEl || companyEl || atAGlanceText || descriptionText) {
       return {
-        title:       titleEl.innerText.trim(),
-        company:     companyEl.innerText.trim(),
-        overview:    overviewEl.innerText.trim(),
-        description: descEl.innerText.trim(),
+        title:       titleEl?.innerText.trim()   ?? '',
+        company:     companyEl?.innerText.trim() ?? '',
+        overview:    atAGlanceText               ?? '',
+        description: descriptionText
       };
     }
     return null;
@@ -85,9 +86,7 @@
     if (msg.type === 'SCRAPE_NOW') {
       const payload = getJobData();
       sendResponse(payload);
-      // No asynchronous work, so no need to return true
     }
-    // If not handling SCRAPE_NOW, do not keep sendResponse channel open
     return false;
   });
 })();
