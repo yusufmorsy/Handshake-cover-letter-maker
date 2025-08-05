@@ -41,16 +41,16 @@
     }
 
     // 5) Description — grab all the text in the known wrapper container
-    const descContainer = document.querySelector(
-      '#skip-to-content > div > div.sc-ldzBfC.gsJmga > div > div > div > div:nth-child(4)'
-    );
-    let descriptionText = '';
-    if (descContainer) {
-      descriptionText = descContainer.innerText.trim();
-      console.log("✓ Description:", descriptionText);
-    } else {
-      console.warn("⚠️ Couldn't find the description container.");
-    }
+    // const descContainer = document.querySelector(
+    //   '#skip-to-content > div > div.sc-ldzBfC.gsJmga > div > div > div > div:nth-child(4)'
+    // );
+    // let descriptionText = '';
+    // if (descContainer) {
+    //   descriptionText = descContainer.innerText.trim();
+    //   console.log("✓ Description:", descriptionText);
+    // } else {
+    //   console.warn("⚠️ Couldn't find the description container.");
+    // }
 
     // 6) Return whatever you were able to scrape
     if (titleEl || companyEl || atAGlanceText || descriptionText) {
