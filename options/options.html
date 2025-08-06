@@ -2,25 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Handshake Cover‑Letter – Settings</title>
+  <title>Handshake Cover-Letter – Settings</title>
   <link rel="stylesheet" href="options.css" />
 </head>
 <body>
   <h2>Settings</h2>
 
-  <label>OpenAI API Key
+  <!-- ❶ OpenAI key -->
+  <label>OpenAI API Key
     <input type="password" id="apiKey" size="40" />
   </label>
 
+  <!-- ❷ User contact info -->
+  <fieldset>
+    <legend>Your contact info (appears at top of every letter)</legend>
+
+    <label>Full name
+      <input type="text" id="userName" size="40" />
+    </label>
+
+    <label>City & State (e.g. “Boulder, CO”)
+      <input type="text" id="cityState" size="40" />
+    </label>
+
+    <label>Phone
+      <input type="text" id="phone" size="40" />
+    </label>
+
+    <label>Email
+      <input type="email" id="email" size="40" />
+    </label>
+  </fieldset>
+
+  <!-- ❸ Resume text -->
   <label>Your résumé / portfolio (plain text)
     <textarea id="resume" rows="10"></textarea>
   </label>
 
-  <label>Download path prefix (optional – e.g. CoverLetters/)
+  <!-- ❹ Download path prefix -->
+  <label>Download path prefix (optional – e.g. “CoverLetters/”)
     <input type="text" id="pathPrefix" size="40" />
   </label>
 
-  <label>Cover‑letter template/instructions (use {{BODY}} placeholder):
+  <!-- ❺ Optional template / extra instructions -->
+  <label>Optional extra instructions or letter template (leave blank for default):
     <textarea id="template" rows="6"></textarea>
   </label>
 

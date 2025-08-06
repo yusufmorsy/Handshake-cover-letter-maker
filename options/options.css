@@ -1,4 +1,17 @@
-body { font-family: system-ui, sans-serif; margin: 20px; max-width: 600px; }
-label { display: block; margin: 12px 0; }
-textarea { width: 100%; }
-button { margin-top: 12px; }
+/* Simple, responsive layout for the Options page */
+body   { font-family: system-ui, sans-serif; margin: 20px; max-width: 640px; }
+label  { display: block; margin: 12px 0; }
+fieldset { border: 1px solid #ccc; padding: 12px; margin: 16px 0; }
+legend  { padding: 0 6px; font-weight: 600; }
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+textarea { resize: vertical; }
+
+button { margin-top: 16px; padding: 6px 14px; }
