@@ -20,20 +20,39 @@
     }
 
     // 3) Overview: side-panel cards OR single-job wrapper
-    const overviewEls = document.querySelectorAll(
-      '.sc-kJCwM.fElEOM, .sc-byhhpF.kgQOGZ'
-    );
-    let atAGlanceText = '';
-    overviewEls.forEach(el => {
-      const txt = el.innerText.trim();
-      if (txt.startsWith('At a glance')) {
-        atAGlanceText = txt;
-      }
-    });
+    // 3) Overview  ─── “At a glance” section
+    let atAGlanceText = "";
+
+    /* New, simpler selector:
+    * On a full Job-Details page Handshake always nests the entire
+    * “At a glance” wrapper at:
+    *   #skip-to-content > div > div:nth-child(3)
+    * If that node exists, just read its innerText.
+    */
+    const overviewContainer =
+      document.querySelector("#skip-to-content > div > div:nth-child(3)") ||
+      document.querySelector("#skip-to-content > div > div:nth-child(2) > div:nth-child(2) > div > div > div > div:nth-child(3)");
+
+    if (overviewContainer) {
+      atAGlanceText = overviewContainer.innerText.trim();
+    } else {
+      // fallback to the side-panel / card selectors (old logic)
+      const overviewEls = document.querySelectorAll(
+        ".sc-kJCwM.fElEOM, .sc-byhhpF.kgQOGZ"
+      );
+      overviewEls.forEach(el => {
+        const txt = el.innerText.trim();
+        if (txt.startsWith("At a glance")) {
+          atAGlanceText = txt;
+        }
+      });
+    }
+
+    // logging (unchanged)
     if (atAGlanceText) {
       console.log("✓ Overview:", atAGlanceText);
     } else {
-      console.warn('⚠️ Could not find the "At a glance" section.');
+      console.warn("⚠️ Could not find the \"At a glance\" section.");
     }
 
     // 4) Expand full description if collapsed
