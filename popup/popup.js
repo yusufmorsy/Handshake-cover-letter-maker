@@ -40,7 +40,7 @@ async function init() {
   ]);
   store.letterCache ||= {};
 
-  statusEl.textContent = "Loading job…";
+  statusEl.textContent = "Reload Your Page";
   previewSec.classList.add("hidden");
   genBtn.disabled = true;
 
