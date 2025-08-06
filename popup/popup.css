@@ -8,3 +8,20 @@ header { margin-bottom: 8px; }
 .hidden { display: none; }
 textarea { width: 100%; }
 button { margin-top: 8px; width: 100%; }
+
+header.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#settingsBtn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;      /* size of the gear icon */
+  cursor: pointer;
+  padding: 0 6px;
+}
+#settingsBtn:hover {
+  opacity: 0.7;
+}
