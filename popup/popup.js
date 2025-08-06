@@ -13,7 +13,7 @@ const letterEl    = document.getElementById("letter");
 const formatEl    = document.getElementById("format");
 const dlBtn       = document.getElementById("downloadBtn");
 const genBtn      = document.getElementById("generateBtn");
-const settingsBtn = document.getElementById("settingsBtn");   // new ⚙️ button
+const settingsBtn = document.getElementById("settingsBtn");   // ⚙️ button
 
 /* ------------ globals ------------ */
 let currentJob = null;   // job payload from scraper
@@ -34,17 +34,17 @@ async function init() {
     "currentJob",
     "apiKey",
     "resumeText",
-    "pathPrefix",
+    "template",
     "user",
     "letterCache"          // { <url>: "<letter text>" }
   ]);
   store.letterCache ||= {};
 
-  statusEl.textContent = "Reload Your Page…";
+  statusEl.textContent = "Loading job…";
   previewSec.classList.add("hidden");
   genBtn.disabled = true;
 
-  /* grab active tab’s job info (or fallback to cached job) */
+  // grab active tab’s job info (or fallback to cached job)
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const scraped = await scrapeWithTimeout(tab.id, 2000);
 
@@ -60,7 +60,7 @@ async function init() {
     return;
   }
 
-  /* show cached letter if we already generated / edited one */
+  // show cached letter if we already generated / edited one
   cacheKey = currentJob.url;
   const cached = store.letterCache[cacheKey] || "";
   if (cached) {
@@ -83,14 +83,15 @@ async function handleGenerate() {
       job:    currentJob,
       resume: store.resumeText || "",
       apiKey: store.apiKey,
-      user:   store.user || {}
+      user:   store.user || {},
+      template: store.template || ""
     });
 
     letterEl.value = letter;
     previewSec.classList.remove("hidden");
     statusEl.textContent = `Draft for: ${currentJob.title}`;
 
-    /* cache the freshly-generated letter */
+    // cache the freshly-generated letter
     store.letterCache[cacheKey] = letter;
     await chrome.storage.local.set({ letterCache: store.letterCache });
     dirty = false;
@@ -119,15 +120,17 @@ function handleTyping() {
 function handleDownload() {
   if (!letterEl.value) return;
 
-  const safeTitle = currentJob.title.replace(/[^a-z0-9]+/gi, "_");
-  const base      = `${safeTitle}_CoverLetter`;
+  const safeTitle = currentJob.title
+    .replace(/[^a-z0-9]+/gi, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
+  const fileBase  = `${safeTitle}_CoverLetter`;
   const ext       = formatEl.value;
-  const prefix    = store.pathPrefix || "";
-  const fileName  = prefix ? `${prefix}/${base}.${ext}` : `${base}.${ext}`;
+  const fileName  = `${fileBase}.${ext}`;
 
   if      (ext === "pdf")  buildPdf(fileName,  letterEl.value);
   else if (ext === "docx") buildDocx(fileName, letterEl.value);
-  else                     buildTxt(fileName,  letterEl.value);
+  else                     buildTxt(fileName, letterEl.value);
 }
 
 /* ---------- open Options page ---------- */
